@@ -17,31 +17,32 @@ namespace apiMF.Controllers
         [HttpGet]
         public IActionResult get()
         {
-            Respuesta oRespuesta = new Respuesta();
-            oRespuesta.Exito = 1;
+            //Respuesta oRespuesta = new Respuesta();
+            //oRespuesta.Exito = 1;
             try
             {
                 using (PostDbContext db = new PostDbContext())
                 {
                     var lst = db.Materiaprimas.OrderByDescending(d => d.IdMateriaPrima).ToList();
-                    oRespuesta.Exito = 1;
-                    oRespuesta.Data = lst;
+                    //oRespuesta.Exito = 1;
+                    //oRespuesta.Data = lst;
+                    return Ok(lst);
 
                 }
 
             }
             catch (Exception ex)
             {
-
-                oRespuesta.Mensaje = ex.Message;
+                return BadRequest(ex.Message);
+                throw;
             }
-            return Ok(oRespuesta);
+            //return Ok(oRespuesta);
 
         }
         [HttpPost]
         public IActionResult Add(MateriaPrimaRequest oModel)
         {
-            Respuesta oRespuesta = new Respuesta();
+            //Respuesta oRespuesta = new Respuesta();
             try
             {
                 using (PostDbContext db = new PostDbContext())
@@ -57,24 +58,23 @@ namespace apiMF.Controllers
                     oMateriaPrima.Stock = oModel.Stock;
                     oMateriaPrima.UnidadMedida = oModel.UnidadMedida;
                     db.Materiaprimas.Add(oMateriaPrima);
-                    db.SaveChanges();
-                    oRespuesta.Exito = 1;
+                    return Ok(db.SaveChanges());
 
                 }
             }
             catch (Exception ex)
             {
-
-                oRespuesta.Mensaje = ex.Message;
+                return BadRequest(ex.Message);
+                throw;
             }
-            return Ok(oRespuesta);
+            //return Ok(oRespuesta);
 
         }
 
         [HttpPut]
         public IActionResult Edit(MateriaPrimaRequest oModel)
         {
-            Respuesta oRespuesta = new Respuesta();
+            //Respuesta oRespuesta = new Respuesta();
             try
             {
                 using (PostDbContext db = new PostDbContext())
@@ -90,41 +90,39 @@ namespace apiMF.Controllers
                     oMateriaPrima.Stock = oModel.Stock;
                     oMateriaPrima.UnidadMedida = oModel.UnidadMedida;
                     db.Entry(oMateriaPrima).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                    db.SaveChanges();
-                    oRespuesta.Exito = 1;
+                    return Ok(db.SaveChanges());
 
                 }
             }
             catch (Exception ex)
             {
-
-                oRespuesta.Mensaje = ex.Message;
+                return BadRequest(ex.Message);
+                throw;
             }
-            return Ok(oRespuesta);
+            //return Ok(oRespuesta);
 
         }
 
         [HttpDelete("{Id}")]
         public IActionResult Delete(int Id)
         {
-            Respuesta oRespuesta = new Respuesta();
+            //Respuesta oRespuesta = new Respuesta();
             try
             {
                 using (PostDbContext db = new PostDbContext())
                 {
                     Materiaprima oMateriaPrima = db.Materiaprimas.Find(Id);
                     db.Remove(oMateriaPrima);
-                    db.SaveChanges();
-                    oRespuesta.Exito = 1;
+                    return Ok(db.SaveChanges());
 
                 }
             }
             catch (Exception ex)
             {
-
-                oRespuesta.Mensaje = ex.Message;
+                return BadRequest(ex.Message);
+                throw;
             }
-            return Ok(oRespuesta);
+            //return Ok(oRespuesta);
 
 
         }

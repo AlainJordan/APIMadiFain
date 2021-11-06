@@ -17,31 +17,33 @@ namespace apiMF.Controllers
         [HttpGet]
         public IActionResult get()
         {
-            Respuesta oRespuesta = new Respuesta();
-            oRespuesta.Exito = 1;
+            //Respuesta oRespuesta = new Respuesta();
+            //oRespuesta.Exito = 1;
             try
             {
                 using (PostDbContext db = new PostDbContext())
                 {
                     var lst = db.Consumibles.OrderByDescending(d => d.IdConsumible).ToList();
-                    oRespuesta.Exito = 1;
-                    oRespuesta.Data = lst;
+                    //oRespuesta.Exito = 1;
+                    //oRespuesta.Data = lst;
+                    return Ok(lst);
 
                 }
 
             }
             catch (Exception ex)
             {
-
-                oRespuesta.Mensaje = ex.Message;
+                return BadRequest(ex.Message);
+                throw;
+                //oRespuesta.Mensaje = ex.Message;
             }
-            return Ok(oRespuesta);
+            //return Ok(oRespuesta);
 
         }
         [HttpPost]
         public IActionResult Add(ConsumibleRequest oModel)
         {
-            Respuesta oRespuesta = new Respuesta();
+            //Respuesta oRespuesta = new Respuesta();
             try
             {
                 using (PostDbContext db = new PostDbContext())
@@ -56,24 +58,24 @@ namespace apiMF.Controllers
                     oConsumible.Stock = oModel.Stock;
                     oConsumible.UnidadMedida = oModel.UnidadMedida;
                     db.Consumibles.Add(oConsumible);
-                    db.SaveChanges();
-                    oRespuesta.Exito = 1;
+                    return Ok(db.SaveChanges());
 
                 }
             }
             catch (Exception ex)
             {
-
-                oRespuesta.Mensaje = ex.Message;
+                return BadRequest(ex.Message);
+                throw;
+                //oRespuesta.Mensaje = ex.Message;
             }
-            return Ok(oRespuesta);
+            //return Ok(oRespuesta);
 
         }
 
         [HttpPut]
         public IActionResult Edit(ConsumibleRequest oModel)
         {
-            Respuesta oRespuesta = new Respuesta();
+            //Respuesta oRespuesta = new Respuesta();
             try
             {
                 using (PostDbContext db = new PostDbContext())
@@ -88,41 +90,41 @@ namespace apiMF.Controllers
                     oConsumible.Stock = oModel.Stock;
                     oConsumible.UnidadMedida = oModel.UnidadMedida;
                     db.Entry(oConsumible).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                    db.SaveChanges();
-                    oRespuesta.Exito = 1;
+                    return Ok(db.SaveChanges());
 
                 }
             }
             catch (Exception ex)
             {
-
-                oRespuesta.Mensaje = ex.Message;
+                return BadRequest(ex.Message);
+                throw;
+                //oRespuesta.Mensaje = ex.Message;
             }
-            return Ok(oRespuesta);
+            //return Ok(oRespuesta);
 
         }
 
         [HttpDelete("{Id}")]
         public IActionResult Delete(int Id)
         {
-            Respuesta oRespuesta = new Respuesta();
+            //Respuesta oRespuesta = new Respuesta();
             try
             {
                 using (PostDbContext db = new PostDbContext())
                 {
                     Consumible oConsumible = db.Consumibles.Find(Id);
                     db.Remove(oConsumible);
-                    db.SaveChanges();
-                    oRespuesta.Exito = 1;
+                    return Ok(db.SaveChanges());
 
                 }
             }
             catch (Exception ex)
             {
-
-                oRespuesta.Mensaje = ex.Message;
+                return BadRequest(ex.Message);
+                throw;
+                //oRespuesta.Mensaje = ex.Message;
             }
-            return Ok(oRespuesta);
+            //return Ok(oRespuesta);
 
 
         }
