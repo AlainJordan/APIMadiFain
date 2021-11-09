@@ -38,6 +38,8 @@ namespace apiMF.Controllers
             }
 
         }
+      
+
         [HttpPost]
         public IActionResult Add(UsuarioRequest oModel)
         {

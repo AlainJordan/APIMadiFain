@@ -26,6 +26,15 @@ namespace apiMF
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                var frontendURL = Configuration.GetValue<string>("frontend_url");
+                options.AddDefaultPolicy(builder =>
+                {
+                    //cabeceras expuestas para realizar la paginacion
+                    builder.WithOrigins(frontendURL).AllowAnyMethod().AllowAnyHeader().WithExposedHeaders();
+                });
+            });
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -47,6 +56,8 @@ namespace apiMF
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthorization();
 

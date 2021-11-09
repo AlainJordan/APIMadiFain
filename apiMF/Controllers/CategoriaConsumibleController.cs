@@ -41,6 +41,35 @@ namespace apiMF.Controllers
           
 
         }
+
+        [HttpGet("{Id:int}")]
+        public IActionResult get(int Id)
+        {
+            //Respuesta oRespuesta = new Respuesta();
+            //oRespuesta.Exito = 1;
+            try
+            {
+                using (PostDbContext db = new PostDbContext())
+                {
+                    var CConsumible = db.Categoriaconsumibles.FirstOrDefault(d => d.IdCategoriaConsumibles==Id);
+                    //oRespuesta.Exito = 1;
+                    //oRespuesta.Data = lst;
+                    return Ok(CConsumible);
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                //oRespuesta.Mensaje = ex.Message;
+                return BadRequest(ex.Message);
+                throw;
+            }
+
+
+        }
+
         [HttpPost]
         public IActionResult Add(CategoriaConsumibleRequest oModel)
         {
@@ -67,8 +96,8 @@ namespace apiMF.Controllers
 
         }
 
-        [HttpPut]
-        public IActionResult Edit(CategoriaConsumibleRequest oModel)
+        [HttpPut("{Id:int}")]
+        public IActionResult Edit(int Id, CategoriaConsumibleRequest oModel)
         {
             //Respuesta oRespuesta = new Respuesta();
             try
