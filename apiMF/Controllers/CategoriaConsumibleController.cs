@@ -1,12 +1,16 @@
 ﻿using apiMF.Models;
 using apiMF.Models.Request;
 using apiMF.Models.Response;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace apiMF.Controllers
 {
@@ -14,77 +18,67 @@ namespace apiMF.Controllers
     [ApiController]
     public class CategoriaConsumibleController : ControllerBase
     {
+        private readonly PostDbContext context;
+        private readonly IMapper mapper;
+
+
+        public CategoriaConsumibleController(PostDbContext context,
+                                                IMapper mapper)
+        {
+            this.context = context;
+            this.mapper = mapper;
+        }
         [HttpGet]
-        public IActionResult get()
+        public async Task<ActionResult<List<Categoriaconsumible>>> get()
         {
             //Respuesta oRespuesta = new Respuesta();
             //oRespuesta.Exito = 1;
             try
             {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    var lst = db.Categoriaconsumibles.OrderByDescending(d => d.IdCategoriaConsumibles).ToList();
-                    //oRespuesta.Exito = 1;
-                    //oRespuesta.Data = lst;
-                    return Ok(lst);
-
-                }
-
+                //var categorias = await context.Categoriaconsumibles.FirstOrDefaultAsync();
+                //return mapper.Map<List<CategoriaConsumibleRequest>>(categorias);
+                return await context.Categoriaconsumibles.ToListAsync();
             }
             catch (Exception ex)
             {
-
                 //oRespuesta.Mensaje = ex.Message;
                 return BadRequest(ex.Message);
                 throw;
             }
-          
+
 
         }
 
         [HttpGet("{Id:int}")]
-        public IActionResult get(int Id)
+        public async Task<ActionResult<CategoriaConsumibleRequest>> get(int Id)
         {
-            //Respuesta oRespuesta = new Respuesta();
-            //oRespuesta.Exito = 1;
             try
             {
-                using (PostDbContext db = new PostDbContext())
+                var categoria = await context.Categoriaconsumibles.FirstOrDefaultAsync(x => x.IdCategoriaConsumibles == Id);
+                if (categoria == null)
                 {
-                    var CConsumible = db.Categoriaconsumibles.FirstOrDefault(d => d.IdCategoriaConsumibles==Id);
-                    //oRespuesta.Exito = 1;
-                    //oRespuesta.Data = lst;
-                    return Ok(CConsumible);
-
+                    return NotFound();
                 }
-
+                return mapper.Map<CategoriaConsumibleRequest>(categoria);
             }
+
             catch (Exception ex)
             {
-
                 //oRespuesta.Mensaje = ex.Message;
                 return BadRequest(ex.Message);
                 throw;
             }
-
-
         }
-
         [HttpPost]
-        public IActionResult Add(CategoriaConsumibleRequest oModel)
+        public async Task<ActionResult> Add([FromBody] CategoriaConsumibleCreacionDTO categoriaConsumibleCreacionDTO)
         {
             //Respuesta oRespuesta = new Respuesta();
             try
             {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    Categoriaconsumible oCategoriaConsumible = new Categoriaconsumible();
-                    oCategoriaConsumible.Descripcion = oModel.Descripcion;
-                    oCategoriaConsumible.NombreCategoriaConsumibles = oModel.NombreCategoriaConsumibles;
-                    db.Categoriaconsumibles.Add(oCategoriaConsumible);
-                    return Ok(db.SaveChanges());
-
-                }
+                var categoria = mapper.Map<Categoriaconsumible>(categoriaConsumibleCreacionDTO);
+                context.Add(categoria);
+                await context.SaveChangesAsync();
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -92,26 +86,22 @@ namespace apiMF.Controllers
                 throw;
                 //oRespuesta.Mensaje = ex.Message;
             }
-            
-
         }
 
         [HttpPut("{Id:int}")]
-        public IActionResult Edit(int Id, CategoriaConsumibleRequest oModel)
+        public async Task<ActionResult> Edit(int Id, [FromBody] CategoriaConsumibleCreacionDTO categoriaConsumibleCreacionDTO)
         {
             //Respuesta oRespuesta = new Respuesta();
             try
             {
-                using (PostDbContext db = new PostDbContext())
+                var categoria = await context.Categoriaconsumibles.FirstOrDefaultAsync(x => x.IdCategoriaConsumibles == Id);
+                if (categoria == null)
                 {
-                    Categoriaconsumible oCategoriaConsumible = db.Categoriaconsumibles.Find(oModel.IdCategoriaConsumibles);
-                    oCategoriaConsumible.Descripcion = oModel.Descripcion;
-                    oCategoriaConsumible.NombreCategoriaConsumibles = oModel.NombreCategoriaConsumibles;
-                    db.Entry(oCategoriaConsumible).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                    return Ok(db.SaveChanges());
-                    //oRespuesta.Exito = 1;
-
+                    return NotFound();
                 }
+                categoria = mapper.Map(categoriaConsumibleCreacionDTO, categoria);
+                await context.SaveChangesAsync();
+                return NoContent();    
             }
             catch (Exception ex)
             {
@@ -119,24 +109,23 @@ namespace apiMF.Controllers
                 throw;
                 //oRespuesta.Mensaje = ex.Message;
             }
-           
 
         }
 
         [HttpDelete("{Id}")]
-        public IActionResult Delete(int Id)
+        public async Task<ActionResult> delete(int Id)
         {
-            Respuesta oRespuesta = new Respuesta();
             try
             {
-                using (PostDbContext db = new PostDbContext())
+                var existe = await context.Categoriaconsumibles.AnyAsync(x => x.IdCategoriaConsumibles == Id);
+                if (!existe)
                 {
-                    Categoriaconsumible oCategoriaConsumible = db.Categoriaconsumibles.Find(Id);
-                    db.Remove(oCategoriaConsumible);
-                    return Ok(db.SaveChanges()); 
-                    //oRespuesta.Exito = 1;
-
+                    return NotFound();
                 }
+                context.Remove(new Categoriaconsumible() { IdCategoriaConsumibles = Id });
+                await context.SaveChangesAsync();
+                return NoContent();
+
             }
             catch (Exception ex)
             {

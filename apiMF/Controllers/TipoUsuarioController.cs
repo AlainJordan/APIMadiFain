@@ -14,98 +14,98 @@ namespace apiMF.Controllers
     [ApiController]
     public class TipoUsuarioController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult get()
-        {
-           // Respuesta oRespuesta = new Respuesta();
-            //oRespuesta.Exito = 1;
-            try
-            {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    var lst = db.Tipousuarios.OrderByDescending(d => d.IdTipoUsuario).ToList();
-                    //oRespuesta.Exito = 1;
-                    //oRespuesta.Data = lst;
-                    return Ok(lst);
-                }
+        //[HttpGet]
+        //public IActionResult get()
+        //{
+        //   // Respuesta oRespuesta = new Respuesta();
+        //    //oRespuesta.Exito = 1;
+        //    try
+        //    {
+        //        using (PostDbContext db = new PostDbContext())
+        //        {
+        //            var lst = db.Tipousuarios.OrderByDescending(d => d.IdTipoUsuario).ToList();
+        //            //oRespuesta.Exito = 1;
+        //            //oRespuesta.Data = lst;
+        //            return Ok(lst);
+        //        }
 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-                throw;
-            }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //        throw;
+        //    }
 
-        }
-        [HttpPost]
-        public IActionResult Add(TipoUsuarioRequest oModel)
-        {
-            //Respuesta oRespuesta = new Respuesta();
-            try
-            {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    Tipousuario oTipousuario = new Tipousuario();
-                    oTipousuario.TipoUsuario1 = oModel.TipoUsuario1;
-                    db.Tipousuarios.Add(oTipousuario);
-                    return Ok(db.SaveChanges());
+        //}
+        //[HttpPost]
+        //public IActionResult Add(TipoUsuarioRequest oModel)
+        //{
+        //    //Respuesta oRespuesta = new Respuesta();
+        //    try
+        //    {
+        //        using (PostDbContext db = new PostDbContext())
+        //        {
+        //            Tipousuario oTipousuario = new Tipousuario();
+        //            oTipousuario.TipoUsuario1 = oModel.TipoUsuario1;
+        //            db.Tipousuarios.Add(oTipousuario);
+        //            return Ok(db.SaveChanges());
 
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-                throw;
-            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //        throw;
+        //    }
 
-        }
+        //}
 
-        [HttpPut]
-        public IActionResult Edit(TipoUsuarioRequest oModel)
-        {
-            //Respuesta oRespuesta = new Respuesta();
-            try
-            {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    Tipousuario oTipousuario = db.Tipousuarios.Find(oModel.IdTipoUsuario);
-                    oTipousuario.TipoUsuario1 = oModel.TipoUsuario1;
-                    db.Entry(oTipousuario).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                    return Ok(db.SaveChanges());
+        //[HttpPut]
+        //public IActionResult Edit(TipoUsuarioRequest oModel)
+        //{
+        //    //Respuesta oRespuesta = new Respuesta();
+        //    try
+        //    {
+        //        using (PostDbContext db = new PostDbContext())
+        //        {
+        //            Tipousuario oTipousuario = db.Tipousuarios.Find(oModel.IdTipoUsuario);
+        //            oTipousuario.TipoUsuario1 = oModel.TipoUsuario1;
+        //            db.Entry(oTipousuario).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        //            return Ok(db.SaveChanges());
 
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-                throw;
-            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //        throw;
+        //    }
             
 
-        }
+        //}
 
-        [HttpDelete("{Id}")]
-        public IActionResult Delete(int Id)
-        {
-            //Respuesta oRespuesta = new Respuesta();
-            try
-            {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    Tipousuario oTipousuario = db.Tipousuarios.Find(Id);
-                    db.Remove(oTipousuario);
-                    return Ok(db.SaveChanges());
+        //[HttpDelete("{Id}")]
+        //public IActionResult Delete(int Id)
+        //{
+        //    //Respuesta oRespuesta = new Respuesta();
+        //    try
+        //    {
+        //        using (PostDbContext db = new PostDbContext())
+        //        {
+        //            Tipousuario oTipousuario = db.Tipousuarios.Find(Id);
+        //            db.Remove(oTipousuario);
+        //            return Ok(db.SaveChanges());
 
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-                throw;
-            }
-            //return Ok(oRespuesta);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //        throw;
+        //    }
+        //    //return Ok(oRespuesta);
 
 
-        }
+        //}
     }
 }

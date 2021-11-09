@@ -8,12 +8,8 @@ namespace apiMF.Models
 {
     public partial class PostDbContext : DbContext
     {
-        public PostDbContext()
-        {
-        }
-
-        public PostDbContext(DbContextOptions<PostDbContext> options)
-            : base(options)
+    
+        public PostDbContext(DbContextOptions options): base(options)
         {
         }
 

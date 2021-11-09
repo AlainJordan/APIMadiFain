@@ -88,3 +88,5 @@ C:\angular\MADIFAIN\APIMadiFain\apiMF\obj\Debug\netcoreapp3.1\apiMF.csproj.CopyC
 C:\angular\MADIFAIN\APIMadiFain\apiMF\obj\Debug\netcoreapp3.1\apiMF.dll
 C:\angular\MADIFAIN\APIMadiFain\apiMF\obj\Debug\netcoreapp3.1\apiMF.pdb
 C:\angular\MADIFAIN\APIMadiFain\apiMF\obj\Debug\netcoreapp3.1\apiMF.genruntimeconfig.cache
+C:\angular\MADIFAIN\APIMadiFain\apiMF\bin\Debug\netcoreapp3.1\AutoMapper.dll
+C:\angular\MADIFAIN\APIMadiFain\apiMF\bin\Debug\netcoreapp3.1\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

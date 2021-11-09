@@ -14,119 +14,119 @@ namespace apiMF.Controllers
     [ApiController]
     public class ConsumibleController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult get()
-        {
-            //Respuesta oRespuesta = new Respuesta();
-            //oRespuesta.Exito = 1;
-            try
-            {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    var lst = db.Consumibles.OrderByDescending(d => d.IdConsumible).ToList();
-                    //oRespuesta.Exito = 1;
-                    //oRespuesta.Data = lst;
-                    return Ok(lst);
+        //[HttpGet]
+        //public IActionResult get()
+        //{
+        //    //Respuesta oRespuesta = new Respuesta();
+        //    //oRespuesta.Exito = 1;
+        //    try
+        //    {
+        //        using (PostDbContext db = new PostDbContext())
+        //        {
+        //            var lst = db.Consumibles.OrderByDescending(d => d.IdConsumible).ToList();
+        //            //oRespuesta.Exito = 1;
+        //            //oRespuesta.Data = lst;
+        //            return Ok(lst);
 
-                }
+        //        }
 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-                throw;
-                //oRespuesta.Mensaje = ex.Message;
-            }
-            //return Ok(oRespuesta);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //        throw;
+        //        //oRespuesta.Mensaje = ex.Message;
+        //    }
+        //    //return Ok(oRespuesta);
 
-        }
-        [HttpPost]
-        public IActionResult Add(ConsumibleRequest oModel)
-        {
-            //Respuesta oRespuesta = new Respuesta();
-            try
-            {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    Consumible oConsumible = new Consumible();
-                    oConsumible.ClaveConsumible = oModel.ClaveConsumible;
-                    oConsumible.DescripcionConsumible = oModel.DescripcionConsumible;
-                    oConsumible.FechaRegistro = oModel.FechaRegistro;
-                    oConsumible.IdCategoriaConsumible = oModel.IdCategoriaConsumible;
-                    oConsumible.Imagen = oModel.Imagen;
-                    oConsumible.NombreConsumible = oModel.NombreConsumible;
-                    oConsumible.Stock = oModel.Stock;
-                    oConsumible.UnidadMedida = oModel.UnidadMedida;
-                    db.Consumibles.Add(oConsumible);
-                    return Ok(db.SaveChanges());
+        //}
+        //[HttpPost]
+        //public IActionResult Add(ConsumibleRequest oModel)
+        //{
+        //    //Respuesta oRespuesta = new Respuesta();
+        //    try
+        //    {
+        //        using (PostDbContext db = new PostDbContext())
+        //        {
+        //            Consumible oConsumible = new Consumible();
+        //            oConsumible.ClaveConsumible = oModel.ClaveConsumible;
+        //            oConsumible.DescripcionConsumible = oModel.DescripcionConsumible;
+        //            oConsumible.FechaRegistro = oModel.FechaRegistro;
+        //            oConsumible.IdCategoriaConsumible = oModel.IdCategoriaConsumible;
+        //            oConsumible.Imagen = oModel.Imagen;
+        //            oConsumible.NombreConsumible = oModel.NombreConsumible;
+        //            oConsumible.Stock = oModel.Stock;
+        //            oConsumible.UnidadMedida = oModel.UnidadMedida;
+        //            db.Consumibles.Add(oConsumible);
+        //            return Ok(db.SaveChanges());
 
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-                throw;
-                //oRespuesta.Mensaje = ex.Message;
-            }
-            //return Ok(oRespuesta);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //        throw;
+        //        //oRespuesta.Mensaje = ex.Message;
+        //    }
+        //    //return Ok(oRespuesta);
 
-        }
+        //}
 
-        [HttpPut]
-        public IActionResult Edit(ConsumibleRequest oModel)
-        {
-            //Respuesta oRespuesta = new Respuesta();
-            try
-            {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    Consumible oConsumible = db.Consumibles.Find(oModel.IdConsumible);
-                    oConsumible.ClaveConsumible = oModel.ClaveConsumible;
-                    oConsumible.DescripcionConsumible = oModel.DescripcionConsumible;
-                    oConsumible.FechaRegistro = oModel.FechaRegistro;
-                    oConsumible.IdCategoriaConsumible = oModel.IdCategoriaConsumible;
-                    oConsumible.Imagen = oModel.Imagen;
-                    oConsumible.NombreConsumible = oModel.NombreConsumible;
-                    oConsumible.Stock = oModel.Stock;
-                    oConsumible.UnidadMedida = oModel.UnidadMedida;
-                    db.Entry(oConsumible).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                    return Ok(db.SaveChanges());
+        //[HttpPut]
+        //public IActionResult Edit(ConsumibleRequest oModel)
+        //{
+        //    //Respuesta oRespuesta = new Respuesta();
+        //    try
+        //    {
+        //        using (PostDbContext db = new PostDbContext())
+        //        {
+        //            Consumible oConsumible = db.Consumibles.Find(oModel.IdConsumible);
+        //            oConsumible.ClaveConsumible = oModel.ClaveConsumible;
+        //            oConsumible.DescripcionConsumible = oModel.DescripcionConsumible;
+        //            oConsumible.FechaRegistro = oModel.FechaRegistro;
+        //            oConsumible.IdCategoriaConsumible = oModel.IdCategoriaConsumible;
+        //            oConsumible.Imagen = oModel.Imagen;
+        //            oConsumible.NombreConsumible = oModel.NombreConsumible;
+        //            oConsumible.Stock = oModel.Stock;
+        //            oConsumible.UnidadMedida = oModel.UnidadMedida;
+        //            db.Entry(oConsumible).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        //            return Ok(db.SaveChanges());
 
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-                throw;
-                //oRespuesta.Mensaje = ex.Message;
-            }
-            //return Ok(oRespuesta);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //        throw;
+        //        //oRespuesta.Mensaje = ex.Message;
+        //    }
+        //    //return Ok(oRespuesta);
 
-        }
+        //}
 
-        [HttpDelete("{Id}")]
-        public IActionResult Delete(int Id)
-        {
-            //Respuesta oRespuesta = new Respuesta();
-            try
-            {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    Consumible oConsumible = db.Consumibles.Find(Id);
-                    db.Remove(oConsumible);
-                    return Ok(db.SaveChanges());
+        //[HttpDelete("{Id}")]
+        //public IActionResult Delete(int Id)
+        //{
+        //    //Respuesta oRespuesta = new Respuesta();
+        //    try
+        //    {
+        //        using (PostDbContext db = new PostDbContext())
+        //        {
+        //            Consumible oConsumible = db.Consumibles.Find(Id);
+        //            db.Remove(oConsumible);
+        //            return Ok(db.SaveChanges());
 
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-                throw;
-                //oRespuesta.Mensaje = ex.Message;
-            }
-            //return Ok(oRespuesta);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //        throw;
+        //        //oRespuesta.Mensaje = ex.Message;
+        //    }
+        //    //return Ok(oRespuesta);
 
 
-        }
+        //}
     }
 }
