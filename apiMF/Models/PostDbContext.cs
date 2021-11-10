@@ -14,7 +14,7 @@ namespace apiMF.Models
         }
 
         public virtual DbSet<Categoriaconsumible> Categoriaconsumibles { get; set; }
-        public virtual DbSet<Categoriaherramientum> Categoriaherramienta { get; set; }
+        public virtual DbSet<Categoriaherramienta> Categoriaherramienta { get; set; }
         public virtual DbSet<Categoriamateriaprima> Categoriamateriaprimas { get; set; }
         public virtual DbSet<Cliente> Clientes { get; set; }
         public virtual DbSet<Consumible> Consumibles { get; set; }
@@ -29,7 +29,7 @@ namespace apiMF.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseMySql("server=localhost;database=madifain;uid=root;pwd=jesus140999", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.26-mysql"));
+                optionsBuilder.UseMySql("server=localhost;database=madifain;uid=root;pwd=jordanlobo07", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.26-mysql"));
             }
         }
 
@@ -56,7 +56,7 @@ namespace apiMF.Models
                     .HasMaxLength(45);
             });
 
-            modelBuilder.Entity<Categoriaherramientum>(entity =>
+            modelBuilder.Entity<Categoriaherramienta>(entity =>
             {
                 entity.HasKey(e => e.IdCategoriaHerramienta)
                     .HasName("PRIMARY");

@@ -14,6 +14,15 @@ namespace apiMF.Utilidades
         {
             CreateMap<Categoriaconsumible, CategoriaConsumibleRequest>().ReverseMap();
             CreateMap<CategoriaConsumibleCreacionDTO, Categoriaconsumible>();
+
+            CreateMap<Categoriaherramienta, CategoriaHerramientumRequest>().ReverseMap();
+            CreateMap<CategoriaHerramientaCreacionDTO, Categoriaherramienta>();
+
+            CreateMap<Tipousuario, TipoUsuarioRequest>().ReverseMap();
+            CreateMap<TipoUsuarioCreacionDTO, Tipousuario>();
+
+            CreateMap<Usuario, UsuarioRequest>().ReverseMap();
+            CreateMap<UsuarioCreacionDTO, Usuario>();
         }
     }
 }
