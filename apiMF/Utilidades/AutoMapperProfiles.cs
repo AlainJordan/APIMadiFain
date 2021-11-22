@@ -23,6 +23,9 @@ namespace apiMF.Utilidades
 
             CreateMap<Usuario, UsuarioRequest>().ReverseMap();
             CreateMap<UsuarioCreacionDTO, Usuario>();
+
+            CreateMap<Consumible, ConsumibleRequest>().ReverseMap();
+            CreateMap<ConsumibleCreacionDTO, Consumible>().ForMember(x=>x.Imagen,options=>options.Ignore());
         }
     }
 }

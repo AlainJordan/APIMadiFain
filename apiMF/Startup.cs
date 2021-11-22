@@ -1,4 +1,5 @@
 using apiMF.Models;
+using apiMF.Utilidades;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -27,8 +28,14 @@ namespace apiMF
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddAutoMapper(typeof(Startup));
+            //configuracion de azure storage
+            services.AddTransient<IAlmacenadorArchivos, AlmacenadorArchivosLocal>();
+
             services.AddDbContext<PostDbContext>();
+            
+            services.AddHttpContextAccessor();
 
             services.AddCors(options =>
             {
@@ -58,6 +65,8 @@ namespace apiMF
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
 
             app.UseRouting();
 

@@ -1,8 +1,11 @@
 ﻿using apiMF.Models;
 using apiMF.Models.Request;
 using apiMF.Models.Response;
+using apiMF.Utilidades;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,119 +17,124 @@ namespace apiMF.Controllers
     [ApiController]
     public class ConsumibleController : ControllerBase
     {
-        //[HttpGet]
-        //public IActionResult get()
+        private readonly PostDbContext context;
+        private readonly IMapper mapper;
+        private readonly IAlmacenadorArchivos almacenadorArchivos;
+        private readonly string contenedor = "consumibles";
+
+
+        public ConsumibleController(PostDbContext context,
+                                                IMapper mapper,
+                                                IAlmacenadorArchivos almacenadorArchivos)
+        {
+            this.context = context;
+            this.mapper = mapper;
+            this.almacenadorArchivos = almacenadorArchivos;
+
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<Consumible>>> get()
+        {
+            //Respuesta oRespuesta = new Respuesta();
+            //oRespuesta.Exito = 1;
+            try
+            {
+                return await context.Consumibles.ToListAsync();
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+
+        }
+        
+        [HttpPost]
+        public async Task<ActionResult> Post([FromForm] ConsumibleCreacionDTO consumibleCreacionDTO)
+        {
+            try
+            {
+                var consumible = mapper.Map<Consumible>(consumibleCreacionDTO);
+                if (consumibleCreacionDTO.Imagen != null)
+                {
+                    consumible.Imagen = await almacenadorArchivos.GuardarArchivo(contenedor, consumibleCreacionDTO.Imagen);
+                }
+                context.Add(consumible);
+                await context.SaveChangesAsync();
+                return NoContent();
+             
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+
+        }
+
+        //[HttpPut("{id:int}")]
+        //public async Task<ActionResult> Put(int id,[FromForm] ConsumibleCreacionDTO consumibleCreacionDTO)
         //{
         //    //Respuesta oRespuesta = new Respuesta();
-        //    //oRespuesta.Exito = 1;
         //    try
         //    {
-        //        using (PostDbContext db = new PostDbContext())
-        //        {
-        //            var lst = db.Consumibles.OrderByDescending(d => d.IdConsumible).ToList();
-        //            //oRespuesta.Exito = 1;
-        //            //oRespuesta.Data = lst;
-        //            return Ok(lst);
-
-        //        }
-
+                
         //    }
         //    catch (Exception ex)
         //    {
         //        return BadRequest(ex.Message);
         //        throw;
-        //        //oRespuesta.Mensaje = ex.Message;
         //    }
-        //    //return Ok(oRespuesta);
-
-        //}
-        //[HttpPost]
-        //public IActionResult Add(ConsumibleRequest oModel)
-        //{
-        //    //Respuesta oRespuesta = new Respuesta();
-        //    try
-        //    {
-        //        using (PostDbContext db = new PostDbContext())
-        //        {
-        //            Consumible oConsumible = new Consumible();
-        //            oConsumible.ClaveConsumible = oModel.ClaveConsumible;
-        //            oConsumible.DescripcionConsumible = oModel.DescripcionConsumible;
-        //            oConsumible.FechaRegistro = oModel.FechaRegistro;
-        //            oConsumible.IdCategoriaConsumible = oModel.IdCategoriaConsumible;
-        //            oConsumible.Imagen = oModel.Imagen;
-        //            oConsumible.NombreConsumible = oModel.NombreConsumible;
-        //            oConsumible.Stock = oModel.Stock;
-        //            oConsumible.UnidadMedida = oModel.UnidadMedida;
-        //            db.Consumibles.Add(oConsumible);
-        //            return Ok(db.SaveChanges());
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //        throw;
-        //        //oRespuesta.Mensaje = ex.Message;
-        //    }
-        //    //return Ok(oRespuesta);
 
         //}
 
-        //[HttpPut]
-        //public IActionResult Edit(ConsumibleRequest oModel)
-        //{
-        //    //Respuesta oRespuesta = new Respuesta();
-        //    try
-        //    {
-        //        using (PostDbContext db = new PostDbContext())
-        //        {
-        //            Consumible oConsumible = db.Consumibles.Find(oModel.IdConsumible);
-        //            oConsumible.ClaveConsumible = oModel.ClaveConsumible;
-        //            oConsumible.DescripcionConsumible = oModel.DescripcionConsumible;
-        //            oConsumible.FechaRegistro = oModel.FechaRegistro;
-        //            oConsumible.IdCategoriaConsumible = oModel.IdCategoriaConsumible;
-        //            oConsumible.Imagen = oModel.Imagen;
-        //            oConsumible.NombreConsumible = oModel.NombreConsumible;
-        //            oConsumible.Stock = oModel.Stock;
-        //            oConsumible.UnidadMedida = oModel.UnidadMedida;
-        //            db.Entry(oConsumible).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        //            return Ok(db.SaveChanges());
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ConsumibleRequest>>Get(int id)
+        {
 
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //        throw;
-        //        //oRespuesta.Mensaje = ex.Message;
-        //    }
-        //    //return Ok(oRespuesta);
+            try
+            {
+                var consumible = await context.Consumibles.FirstOrDefaultAsync(x => x.IdConsumible == id);
+                if (consumible == null)
+                {
+                    return NotFound();
+                }
+                return mapper.Map<ConsumibleRequest>(consumible);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+        }
 
-        //}
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
 
-        //[HttpDelete("{Id}")]
-        //public IActionResult Delete(int Id)
-        //{
-        //    //Respuesta oRespuesta = new Respuesta();
-        //    try
-        //    {
-        //        using (PostDbContext db = new PostDbContext())
-        //        {
-        //            Consumible oConsumible = db.Consumibles.Find(Id);
-        //            db.Remove(oConsumible);
-        //            return Ok(db.SaveChanges());
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //        throw;
-        //        //oRespuesta.Mensaje = ex.Message;
-        //    }
-        //    //return Ok(oRespuesta);
+            try
+            {
+                var consumible = await context.Consumibles.FirstOrDefaultAsync(x => x.IdConsumible == id);
+                if (consumible == null)
+                {
+                    return NotFound();
+                }
+                context.Remove(consumible);
+                await context.SaveChangesAsync();
+                await almacenadorArchivos.BorrarArchivo(consumible.Imagen, contenedor);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
 
 
-        //}
+        }
+
+
     }
 }
