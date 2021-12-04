@@ -7,6 +7,7 @@ namespace apiMF.Models
 {
     public partial class Consumible
     {
+    
         public string ClaveConsumible { get; set; }
         public string DescripcionConsumible { get; set; }
         public DateTime FechaRegistro { get; set; }

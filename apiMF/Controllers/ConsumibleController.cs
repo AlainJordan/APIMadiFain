@@ -74,21 +74,31 @@ namespace apiMF.Controllers
 
         }
 
-        //[HttpPut("{id:int}")]
-        //public async Task<ActionResult> Put(int id,[FromForm] ConsumibleCreacionDTO consumibleCreacionDTO)
-        //{
-        //    //Respuesta oRespuesta = new Respuesta();
-        //    try
-        //    {
-                
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //        throw;
-        //    }
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromForm] ConsumibleCreacionDTO consumibleCreacionDTO)
+        {
+            try
+            {
+                var consumible = await context.Consumibles.FirstOrDefaultAsync(x => x.IdConsumible == id);
+                if (consumible == null)
+                {
+                    return NotFound();
+                }
+                consumible = mapper.Map(consumibleCreacionDTO, consumible);
+                if (consumibleCreacionDTO.Imagen != null)
+                {
+                    consumible.Imagen = await almacenadorArchivos.EditarArchivo(contenedor, consumibleCreacionDTO.Imagen, consumible.Imagen);
+                }
+                await context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
 
-        //}
+        }
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ConsumibleRequest>>Get(int id)
