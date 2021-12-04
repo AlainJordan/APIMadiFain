@@ -1,8 +1,11 @@
 ﻿using apiMF.Models;
 using apiMF.Models.Request;
 using apiMF.Models.Response;
+using apiMF.Utilidades;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,117 +17,132 @@ namespace apiMF.Controllers
     [ApiController]
     public class MateriaPrimaController : ControllerBase
     {
-    //    [HttpGet]
-    //    public IActionResult get()
-    //    {
-    //        //Respuesta oRespuesta = new Respuesta();
-    //        //oRespuesta.Exito = 1;
-    //        try
-    //        {
-    //            using (PostDbContext db = new PostDbContext())
-    //            {
-    //                var lst = db.Materiaprimas.OrderByDescending(d => d.IdMateriaPrima).ToList();
-    //                //oRespuesta.Exito = 1;
-    //                //oRespuesta.Data = lst;
-    //                return Ok(lst);
-
-    //            }
-
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            return BadRequest(ex.Message);
-    //            throw;
-    //        }
-    //        //return Ok(oRespuesta);
-
-    //    }
-    //    [HttpPost]
-    //    public IActionResult Add(MateriaPrimaRequest oModel)
-    //    {
-    //        //Respuesta oRespuesta = new Respuesta();
-    //        try
-    //        {
-    //            using (PostDbContext db = new PostDbContext())
-    //            {
-    //                Materiaprima oMateriaPrima = new Materiaprima();
-    //                oMateriaPrima.CategoriaMateriaPrima = oModel.CategoriaMateriaPrima;
-    //                oMateriaPrima.DescripcionMateriaPrima = oModel.DescripcionMateriaPrima;
-    //                oMateriaPrima.ClaveMateriaPrima = oModel.ClaveMateriaPrima;
-    //                oMateriaPrima.FechaRegistro = oModel.FechaRegistro;
-    //                oMateriaPrima.IdCategoriaMateriaPrima = oModel.IdCategoriaMateriaPrima;
-    //                oMateriaPrima.Imagen = oModel.Imagen;
-    //                oMateriaPrima.NombreMateriaPrima = oModel.NombreMateriaPrima;
-    //                oMateriaPrima.Stock = oModel.Stock;
-    //                oMateriaPrima.UnidadMedida = oModel.UnidadMedida;
-    //                db.Materiaprimas.Add(oMateriaPrima);
-    //                return Ok(db.SaveChanges());
-
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            return BadRequest(ex.Message);
-    //            throw;
-    //        }
-    //        //return Ok(oRespuesta);
-
-    //    }
-
-    //    [HttpPut]
-    //    public IActionResult Edit(MateriaPrimaRequest oModel)
-    //    {
-    //        //Respuesta oRespuesta = new Respuesta();
-    //        try
-    //        {
-    //            using (PostDbContext db = new PostDbContext())
-    //            {
-    //                Materiaprima oMateriaPrima = db.Materiaprimas.Find(oModel.IdMateriaPrima);
-    //                oMateriaPrima.CategoriaMateriaPrima = oModel.CategoriaMateriaPrima;
-    //                oMateriaPrima.DescripcionMateriaPrima = oModel.DescripcionMateriaPrima;
-    //                oMateriaPrima.ClaveMateriaPrima = oModel.ClaveMateriaPrima;
-    //                oMateriaPrima.FechaRegistro = oModel.FechaRegistro;
-    //                oMateriaPrima.IdCategoriaMateriaPrima = oModel.IdCategoriaMateriaPrima;
-    //                oMateriaPrima.Imagen = oModel.Imagen;
-    //                oMateriaPrima.NombreMateriaPrima = oModel.NombreMateriaPrima;
-    //                oMateriaPrima.Stock = oModel.Stock;
-    //                oMateriaPrima.UnidadMedida = oModel.UnidadMedida;
-    //                db.Entry(oMateriaPrima).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-    //                return Ok(db.SaveChanges());
-
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            return BadRequest(ex.Message);
-    //            throw;
-    //        }
-    //        //return Ok(oRespuesta);
-
-    //    }
-
-    //    [HttpDelete("{Id}")]
-    //    public IActionResult Delete(int Id)
-    //    {
-    //        //Respuesta oRespuesta = new Respuesta();
-    //        try
-    //        {
-    //            using (PostDbContext db = new PostDbContext())
-    //            {
-    //                Materiaprima oMateriaPrima = db.Materiaprimas.Find(Id);
-    //                db.Remove(oMateriaPrima);
-    //                return Ok(db.SaveChanges());
-
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            return BadRequest(ex.Message);
-    //            throw;
-    //        }
-    //        //return Ok(oRespuesta);
+        private readonly PostDbContext context;
+        private readonly IMapper mapper;
+        private readonly IAlmacenadorArchivos almacenadorArchivos;
+        private readonly string contenedor = "materiaPrima";
 
 
-    //    }
+        public MateriaPrimaController(PostDbContext context,
+                                                IMapper mapper,
+                                                IAlmacenadorArchivos almacenadorArchivos)
+        {
+            this.context = context;
+            this.mapper = mapper;
+            this.almacenadorArchivos = almacenadorArchivos;
+
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<Materiaprima>>> get()
+        {
+            //Respuesta oRespuesta = new Respuesta();
+            //oRespuesta.Exito = 1;
+            try
+            {
+                return await context.Materiaprimas.ToListAsync();
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Post([FromForm] MateriaPrimaCreacionDTO materiaPrimaCreacionDTO)
+        {
+            try
+            {
+                var materiaPrima = mapper.Map<Consumible>(materiaPrimaCreacionDTO);
+                if (materiaPrimaCreacionDTO.Imagen != null)
+                {
+                    materiaPrima.Imagen = await almacenadorArchivos.GuardarArchivo(contenedor, materiaPrimaCreacionDTO.Imagen);
+                }
+                context.Add(materiaPrima);
+                await context.SaveChangesAsync();
+                return NoContent();
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromForm] MateriaPrimaCreacionDTO materiaPrimaCreacionDTO)
+        {
+            try
+            {
+                var materiaPrima = await context.Materiaprimas.FirstOrDefaultAsync(x => x.IdMateriaPrima == id);
+                if (materiaPrima == null)
+                {
+                    return NotFound();
+                }
+                materiaPrima = mapper.Map(materiaPrimaCreacionDTO, materiaPrima);
+                if (materiaPrimaCreacionDTO.Imagen != null)
+                {
+                    materiaPrima.Imagen = await almacenadorArchivos.EditarArchivo(contenedor, materiaPrimaCreacionDTO.Imagen, materiaPrima.Imagen);
+                }
+                await context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ConsumibleRequest>> Get(int id)
+        {
+
+            try
+            {
+                var materiaPrima = await context.Materiaprimas.FirstOrDefaultAsync(x => x.IdMateriaPrima == id);
+                if (materiaPrima == null)
+                {
+                    return NotFound();
+                }
+                return mapper.Map<ConsumibleRequest>(materiaPrima);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+
+            try
+            {
+                var materiaPrima = await context.Materiaprimas.FirstOrDefaultAsync(x => x.IdMateriaPrima == id);
+                if (materiaPrima == null)
+                {
+                    return NotFound();
+                }
+                context.Remove(materiaPrima);
+                await context.SaveChangesAsync();
+                await almacenadorArchivos.BorrarArchivo(materiaPrima.Imagen, contenedor);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+
+
+        }
     }
 }

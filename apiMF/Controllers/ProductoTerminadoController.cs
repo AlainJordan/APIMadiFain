@@ -1,8 +1,11 @@
 ﻿using apiMF.Models;
 using apiMF.Models.Request;
 using apiMF.Models.Response;
+using apiMF.Utilidades;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,112 +17,126 @@ namespace apiMF.Controllers
     [ApiController]
     public class ProductoTerminadoController : ControllerBase
     {
-        //[HttpGet]
-        //public IActionResult get()
-        //{
-        //    //Respuesta oRespuesta = new Respuesta();
-        //    //oRespuesta.Exito = 1;
-        //    try
-        //    {
-        //        using (PostDbContext db = new PostDbContext())
-        //        {
-        //            var lst = db.Productoterminados.OrderByDescending(d => d.IdProductoTerminado).ToList();
-        //            //oRespuesta.Exito = 1;
-        //            //oRespuesta.Data = lst;
-        //            return Ok(lst);
-        //        }
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //        throw;
-        //    }
-        //   // return Ok(oRespuesta);
-
-        //}
-        //[HttpPost]
-        //public IActionResult Add(ProductoTerminadoRequest oModel)
-        //{
-        //    //Respuesta oRespuesta = new Respuesta();
-        //    try
-        //    {
-        //        using (PostDbContext db = new PostDbContext())
-        //        {
-        //            Productoterminado oProductoTerminado = new Productoterminado();
-        //            oProductoTerminado.DescripcionProductoTerminado = oModel.DescripcionProductoTerminado;
-        //            oProductoTerminado.Empresa = oModel.Empresa;
-        //            oProductoTerminado.FechaLlegada = oModel.FechaLlegada;
-        //            oProductoTerminado.IdCliente = oModel.IdCliente;
-        //            oProductoTerminado.NombreProductoTerminado = oModel.NombreProductoTerminado;
-        //            oProductoTerminado.Status = oModel.Status;
-        //            oProductoTerminado.Stock = oModel.Stock;
-        //            db.Productoterminados.Add(oProductoTerminado);
-        //            return Ok(db.SaveChanges());
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //        throw;
-        //    }
-        //    //return Ok(oRespuesta);
-
-        //}
-
-        //[HttpPut]
-        //public IActionResult Edit(ProductoTerminadoRequest oModel)
-        //{
-        //    //Respuesta oRespuesta = new Respuesta();
-        //    try
-        //    {
-        //        using (PostDbContext db = new PostDbContext())
-        //        {
-        //            Productoterminado oProductoTerminado = db.Productoterminados.Find(oModel.IdProductoTerminado);
-        //            oProductoTerminado.DescripcionProductoTerminado = oModel.DescripcionProductoTerminado;
-        //            oProductoTerminado.Empresa = oModel.Empresa;
-        //            oProductoTerminado.FechaLlegada = oModel.FechaLlegada;
-        //            oProductoTerminado.IdCliente = oModel.IdCliente;
-        //            oProductoTerminado.NombreProductoTerminado = oModel.NombreProductoTerminado;
-        //            oProductoTerminado.Status = oModel.Status;
-        //            oProductoTerminado.Stock = oModel.Stock;
-        //            db.Entry(oProductoTerminado).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        //            return Ok(db.SaveChanges());
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //        throw;
-        //    }
-        //   // return Ok(oRespuesta);
-
-        //}
-
-        //[HttpDelete("{Id}")]
-        //public IActionResult Delete(int Id)
-        //{
-        //    //Respuesta oRespuesta = new Respuesta();
-        //    try
-        //    {
-        //        using (PostDbContext db = new PostDbContext())
-        //        {
-        //            Productoterminado oProductoTerminado = db.Productoterminados.Find(Id);
-        //            db.Remove(oProductoTerminado);
-        //            return Ok(db.SaveChanges());
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //        throw;
-        //    }
-        //    //return Ok(oRespuesta);
+        private readonly PostDbContext context;
+        private readonly IMapper mapper;
+        private readonly IAlmacenadorArchivos almacenadorArchivos;
+        private readonly string contenedor = "productoTerminado";
 
 
-        //}
+        public ProductoTerminadoController(PostDbContext context,
+                                                IMapper mapper,
+                                                IAlmacenadorArchivos almacenadorArchivos)
+        {
+            this.context = context;
+            this.mapper = mapper;
+            this.almacenadorArchivos = almacenadorArchivos;
+
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<Productoterminado>>> get()
+        {
+            //Respuesta oRespuesta = new Respuesta();
+            //oRespuesta.Exito = 1;
+            try
+            {
+                return await context.Productoterminados.ToListAsync();
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Post([FromForm] ProductoTerminadoCreacionDTO productoTerminadoCreacionDTO)
+        {
+            try
+            {
+                var productoTerminado = mapper.Map<Productoterminado>(productoTerminadoCreacionDTO);
+                
+                context.Add(productoTerminado);
+                await context.SaveChangesAsync();
+                return NoContent();
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromForm] ProductoTerminadoCreacionDTO productoTerminadoCreacionDTO)
+        {
+            try
+            {
+                var productoTerminado = await context.Productoterminados.FirstOrDefaultAsync(x => x.IdProductoTerminado == id);
+                if (productoTerminado == null)
+                {
+                    return NotFound();
+                }
+                productoTerminado = mapper.Map(productoTerminadoCreacionDTO, productoTerminado);
+               
+                await context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ProductoTerminadoRequest>> Get(int id)
+        {
+
+            try
+            {
+                var productoTerminado = await context.Productoterminados.FirstOrDefaultAsync(x => x.IdProductoTerminado == id);
+                if (productoTerminado == null)
+                {
+                    return NotFound();
+                }
+                return mapper.Map<ProductoTerminadoRequest>(productoTerminado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+
+            try
+            {
+                var productoTerminado = await context.Productoterminados.FirstOrDefaultAsync(x => x.IdProductoTerminado == id);
+                if (productoTerminado == null)
+                {
+                    return NotFound();
+                }
+                context.Remove(productoTerminado);
+                await context.SaveChangesAsync();
+                
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+
+
+        }
     }
 }
