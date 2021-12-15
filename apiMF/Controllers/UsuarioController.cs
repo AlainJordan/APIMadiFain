@@ -30,7 +30,7 @@ namespace apiMF.Controllers
         {
             List<UsuarioModificado> usuario = new List<UsuarioModificado>();
             List<Tipousuario> tipoUsuario = new List<Tipousuario>();
-            foreach (var TUsuario in context.Tipousuarios)
+             foreach (var TUsuario in context.Tipousuarios)
             {
                 tipoUsuario.Add(TUsuario);
 
