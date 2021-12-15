@@ -16,6 +16,8 @@ using System.Threading.Tasks;
 
 namespace apiMF.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class UserController:ControllerBase
     {
         private readonly PostDbContext context;
