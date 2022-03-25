@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-
-#nullable disable
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace apiMF.Models
 {
-    public partial class Categoriaherramientum
+    public partial class Categoriaherramienta
     {
         public int IdCategoriaHerramienta { get; set; }
         public string Descripcion { get; set; }

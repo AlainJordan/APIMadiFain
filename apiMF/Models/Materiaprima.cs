@@ -13,7 +13,7 @@ namespace apiMF.Models
         public DateTime FechaRegistro { get; set; }
         public int IdCategoriaMateriaPrima { get; set; }
         public int IdMateriaPrima { get; set; }
-        public int? Imagen { get; set; }
+        public string Imagen { get; set; }
         public string NombreMateriaPrima { get; set; }
         public double Stock { get; set; }
         public decimal? UnidadMedida { get; set; }

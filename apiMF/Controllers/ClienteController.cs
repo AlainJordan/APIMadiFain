@@ -1,8 +1,11 @@
 ﻿using apiMF.Models;
 using apiMF.Models.Request;
 using apiMF.Models.Response;
+using apiMF.Utilidades;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,109 +17,121 @@ namespace apiMF.Controllers
     [ApiController]
     public class ClienteController : ControllerBase
     {
+        private readonly PostDbContext context;
+        private readonly IMapper mapper;
+        private readonly IAlmacenadorArchivos almacenadorArchivos;
+        private readonly string contenedor = "clientes";
+
+
+        public ClienteController(PostDbContext context,
+                                                IMapper mapper,
+                                                IAlmacenadorArchivos almacenadorArchivos)
+        {
+            this.context = context;
+            this.mapper = mapper;
+            this.almacenadorArchivos = almacenadorArchivos;
+
+        }
+
         [HttpGet]
-        public IActionResult get()
+        public async Task<ActionResult<List<Cliente>>> get()
         {
             //Respuesta oRespuesta = new Respuesta();
             //oRespuesta.Exito = 1;
             try
             {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    var lst = db.Clientes.OrderByDescending(d => d.IdCliente).ToList();
-                    //oRespuesta.Exito = 1;
-                    //oRespuesta.Data = lst;
-                    return Ok(lst);
-
-                }
+                return await context.Clientes.ToListAsync();
 
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
                 throw;
-                //oRespuesta.Mensaje = ex.Message;
             }
-            //return Ok(oRespuesta);
 
         }
+
         [HttpPost]
-        public IActionResult Add(ClienteRequest oModel)
+        public async Task<ActionResult> Post([FromForm] ClienteCreacionDTO clienteCreacionDTO)
         {
-            //Respuesta oRespuesta = new Respuesta();
             try
             {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    Cliente oCliente = new Cliente();
-                    oCliente.Correo = oModel.Correo;
-                    oCliente.NombreCliente = oModel.NombreCliente;
-                    oCliente.ProductoTerminado = oModel.ProductoTerminado;
-                    oCliente.Telefono = oModel.Telefono;
-                    db.Clientes.Add(oCliente);
-                    return Ok(db.SaveChanges());
-
-                }
+                var cliente = mapper.Map<Cliente>(clienteCreacionDTO);
+                context.Add(cliente);
+                await context.SaveChangesAsync();
+                return NoContent();
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
                 throw;
-                //oRespuesta.Mensaje = ex.Message;
             }
-            //return Ok(oRespuesta);
 
         }
 
-        [HttpPut]
-        public IActionResult Edit(ClienteRequest oModel)
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromForm] ClienteCreacionDTO clienteCreacionDTO)
         {
-            //Respuesta oRespuesta = new Respuesta();
             try
             {
-                using (PostDbContext db = new PostDbContext())
+                var cliente = await context.Clientes.FirstOrDefaultAsync(x => x.IdCliente == id);
+                if (cliente == null)
                 {
-                    Cliente oCliente = db.Clientes.Find(oModel.IdCliente);
-                    oCliente.Correo = oModel.Correo;
-                    oCliente.NombreCliente = oModel.NombreCliente;
-                    oCliente.ProductoTerminado = oModel.ProductoTerminado;
-                    oCliente.Telefono = oModel.Telefono;
-                    db.Entry(oCliente).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                    return Ok(db.SaveChanges());
-
+                    return NotFound();
                 }
+                cliente = mapper.Map(clienteCreacionDTO, cliente);
+                await context.SaveChangesAsync();
+                return NoContent();
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
                 throw;
-                //oRespuesta.Mensaje = ex.Message;
             }
-            //return Ok(oRespuesta);
 
         }
 
-        [HttpDelete("{Id}")]
-        public IActionResult Delete(int Id)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ClienteRequest>> Get(int id)
         {
-            //Respuesta oRespuesta = new Respuesta();
+
             try
             {
-                using (PostDbContext db = new PostDbContext())
+                var cliente = await context.Clientes.FirstOrDefaultAsync(x => x.IdCliente == id);
+                if (cliente == null)
                 {
-                    Cliente oCliente = db.Clientes.Find(Id);
-                    db.Remove(oCliente);
-                    return Ok(db.SaveChanges());
-
+                    return NotFound();
                 }
+                return mapper.Map<ClienteRequest>(cliente);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
                 throw;
-                //oRespuesta.Mensaje = ex.Message;
             }
-            //return Ok(oRespuesta);
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+
+            try
+            {
+                var cliente = await context.Clientes.FirstOrDefaultAsync(x => x.IdCliente == id);
+                if (cliente == null)
+                {
+                    return NotFound();
+                }
+                context.Remove(cliente);
+                await context.SaveChangesAsync();
+                //await almacenadorArchivos.BorrarArchivo(consumible.Imagen, contenedor);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
 
 
         }

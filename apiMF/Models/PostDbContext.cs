@@ -8,17 +8,13 @@ namespace apiMF.Models
 {
     public partial class PostDbContext : DbContext
     {
-        public PostDbContext()
-        {
-        }
-
-        public PostDbContext(DbContextOptions<PostDbContext> options)
-            : base(options)
+    
+        public PostDbContext(DbContextOptions options): base(options)
         {
         }
 
         public virtual DbSet<Categoriaconsumible> Categoriaconsumibles { get; set; }
-        public virtual DbSet<Categoriaherramientum> Categoriaherramienta { get; set; }
+        public virtual DbSet<Categoriaherramienta> Categoriaherramienta { get; set; }
         public virtual DbSet<Categoriamateriaprima> Categoriamateriaprimas { get; set; }
         public virtual DbSet<Cliente> Clientes { get; set; }
         public virtual DbSet<Consumible> Consumibles { get; set; }
@@ -60,7 +56,7 @@ namespace apiMF.Models
                     .HasMaxLength(45);
             });
 
-            modelBuilder.Entity<Categoriaherramientum>(entity =>
+            modelBuilder.Entity<Categoriaherramienta>(entity =>
             {
                 entity.HasKey(e => e.IdCategoriaHerramienta)
                     .HasName("PRIMARY");

@@ -1,8 +1,11 @@
 ﻿using apiMF.Models;
 using apiMF.Models.Request;
 using apiMF.Models.Response;
+using apiMF.Utilidades;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,112 +17,130 @@ namespace apiMF.Controllers
     [ApiController]
     public class HerramientumController : ControllerBase
     {
+        private readonly PostDbContext context;
+        private readonly IMapper mapper;
+        private readonly IAlmacenadorArchivos almacenadorArchivos;
+        private readonly string contenedor = "herramienta";
+
+
+        public HerramientumController(PostDbContext context,
+                                                IMapper mapper,
+                                                IAlmacenadorArchivos almacenadorArchivos)
+        {
+            this.context = context;
+            this.mapper = mapper;
+            this.almacenadorArchivos = almacenadorArchivos;
+
+        }
+
         [HttpGet]
-        public IActionResult get()
+        public async Task<ActionResult<List<Herramientum>>> get()
         {
             //Respuesta oRespuesta = new Respuesta();
             //oRespuesta.Exito = 1;
             try
             {
-                using (PostDbContext db = new PostDbContext())
-                {
-                    var lst = db.Herramienta.OrderByDescending(d => d.IdHerramienta).ToList();
-                    //oRespuesta.Exito = 1;
-                    //oRespuesta.Data = lst;
-                    return Ok(lst);
-                }
+                return await context.Herramienta.ToListAsync();
 
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
                 throw;
-                //oRespuesta.Mensaje = ex.Message;
             }
-            //return Ok(oRespuesta);
 
         }
+
         [HttpPost]
-        public IActionResult Add(HerramientumRequest oModel)
+        public async Task<ActionResult> Post([FromForm] HerramientaCreacionDTO herramientaCreacionDTO)
         {
-            //Respuesta oRespuesta = new Respuesta();
             try
             {
-                using (PostDbContext db = new PostDbContext())
+                var herramienta = mapper.Map<Herramientum>(herramientaCreacionDTO);
+                if (herramientaCreacionDTO.Imagen != null)
                 {
-                    Herramientum oHerramienta = new Herramientum();
-                    oHerramienta.ClaveHerramienta = oModel.ClaveHerramienta;
-                    oHerramienta.DescripcionHerramienta = oModel.DescripcionHerramienta;
-                    oHerramienta.FechaRegistro = oModel.FechaRegistro;
-                    oHerramienta.IdCategoriaHerramienta = oModel.IdCategoriaHerramienta;
-                    oHerramienta.Imagen = oModel.Imagen;
-                    oHerramienta.NombreHerramienta = oModel.NombreHerramienta;
-                    oHerramienta.Stock = oModel.Stock;
-                    db.Herramienta.Add(oHerramienta);
-                    return Ok(db.SaveChanges());
-
+                    herramienta.Imagen = await almacenadorArchivos.GuardarArchivo(contenedor, herramientaCreacionDTO.Imagen);
                 }
+                context.Add(herramienta);
+                await context.SaveChangesAsync();
+                return NoContent();
+
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
                 throw;
-                //oRespuesta.Mensaje = ex.Message;
             }
-            //return Ok(oRespuesta);
 
         }
 
-        [HttpPut]
-        public IActionResult Edit(HerramientumRequest oModel)
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromForm] HerramientaCreacionDTO herramientaCreacionDTO)
         {
-            //Respuesta oRespuesta = new Respuesta();
             try
             {
-                using (PostDbContext db = new PostDbContext())
+                var herramienta = await context.Herramienta.FirstOrDefaultAsync(x => x.IdHerramienta == id);
+                if (herramienta == null)
                 {
-                    Herramientum oHerramienta = db.Herramienta.Find(oModel.IdHerramienta);
-                    oHerramienta.ClaveHerramienta = oModel.ClaveHerramienta;
-                    oHerramienta.DescripcionHerramienta = oModel.DescripcionHerramienta;
-                    oHerramienta.FechaRegistro = oModel.FechaRegistro;
-                    oHerramienta.IdCategoriaHerramienta = oModel.IdCategoriaHerramienta;
-                    oHerramienta.Imagen = oModel.Imagen;
-                    oHerramienta.NombreHerramienta = oModel.NombreHerramienta;
-                    oHerramienta.Stock = oModel.Stock;
-                    db.Entry(oHerramienta).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                    return Ok(db.SaveChanges());
-
+                    return NotFound();
                 }
+                herramienta = mapper.Map(herramientaCreacionDTO, herramienta);
+                if (herramientaCreacionDTO.Imagen != null)
+                {
+                    herramienta.Imagen = await almacenadorArchivos.EditarArchivo(contenedor, herramientaCreacionDTO.Imagen, herramienta.Imagen);
+                }
+                await context.SaveChangesAsync();
+                return NoContent();
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
                 throw;
             }
-            //return Ok(oRespuesta);
 
         }
 
-        [HttpDelete("{Id}")]
-        public IActionResult Delete(int Id)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ConsumibleRequest>> Get(int id)
         {
-            //Respuesta oRespuesta = new Respuesta();
+
             try
             {
-                using (PostDbContext db = new PostDbContext())
+                var herramienta = await context.Herramienta.FirstOrDefaultAsync(x => x.IdHerramienta == id);
+                if (herramienta == null)
                 {
-                    Herramientum oHerramienta = db.Herramienta.Find(Id);
-                    db.Remove(oHerramienta);
-                    return Ok(db.SaveChanges());
-
+                    return NotFound();
                 }
+                return mapper.Map<ConsumibleRequest>(herramienta);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
                 throw;
             }
-            //return Ok(oRespuesta);
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+
+            try
+            {
+                var herramienta = await context.Herramienta.FirstOrDefaultAsync(x => x.IdHerramienta == id);
+                if (herramienta == null)
+                {
+                    return NotFound();
+                }
+                context.Remove(herramienta);
+                await context.SaveChangesAsync();
+                await almacenadorArchivos.BorrarArchivo(herramienta.Imagen, contenedor);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
 
 
         }
